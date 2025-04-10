@@ -70,11 +70,11 @@ export const App: React.FC = () => {
       })
       .catch(() => {
         setError(ErrorMessage.ADD);
+        setNewTitle(newTitle);
         (inputRef.current as HTMLInputElement).disabled = false;
         inputRef.current?.focus();
       })
       .finally(() => {
-        setNewTitle('');
         setTempTodo(null);
         setLoading(false);
       });
@@ -184,7 +184,10 @@ export const App: React.FC = () => {
 
     setLoadingTodo(prev => [...prev, todo.id]);
 
-    updateTodo(todo.id, { title: updatedTitle, completed: todo.completed })
+    updateTodo(todo.id, {
+      title: updatedTitle.trim(),
+      completed: todo.completed,
+    })
       .then(updatedTodo => {
         setTodos(prevTodos => {
           return prevTodos.map(t =>
@@ -205,6 +208,7 @@ export const App: React.FC = () => {
       <h1 className="todoapp__title">todos</h1>
       <div className="todoapp__content">
         <Header
+          todos={todos}
           handleAddTodo={handleAddTodo}
           newTitle={newTitle}
           setNewTitle={setNewTitle}
@@ -219,6 +223,7 @@ export const App: React.FC = () => {
           loadingTodo={loadingTodo}
           handleToggle={handleToggleTodo}
           handleEdit={handleEdit}
+          inputRef={inputRef}
         />
         {/* Hide the footer if there are no todos */}
         {todos.length > 0 && (

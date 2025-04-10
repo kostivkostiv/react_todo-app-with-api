@@ -8,6 +8,7 @@ type Props = {
   loadingTodo: number[];
   handleToggle: (todo: Todo) => void;
   handleEdit: (todo: Todo, updatedTitle: string) => void;
+  inputRef: React.RefObject<HTMLInputElement>;
 };
 
 export const TodoItem: React.FC<Props> = ({
@@ -41,6 +42,15 @@ export const TodoItem: React.FC<Props> = ({
     }
   }
 
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (editedTitle.trim() !== todo.title) {
+      handleEdit(todo, editedTitle);
+    }
+
+    setIsEditing(false);
+  };
+
   return (
     <div
       data-cy="Todo"
@@ -58,15 +68,18 @@ export const TodoItem: React.FC<Props> = ({
       </label>
 
       {isEditing ? (
-        <input
-          type="text"
-          value={editedTitle}
-          onChange={e => setEditedTitle(e.target.value)}
-          onBlur={handleBlur}
-          onKeyUp={handleKeyUp}
-          autoFocus
-          className="todo__title-field  "
-        />
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            data-cy="TodoTitleField"
+            value={editedTitle}
+            onChange={e => setEditedTitle(e.target.value)}
+            placeholder="Empty todo will be deleted"
+            onKeyUp={handleKeyUp}
+            className="todo__title-field"
+            autoFocus
+          />
+        </form>
       ) : (
         <span
           data-cy="TodoTitle"
@@ -76,15 +89,16 @@ export const TodoItem: React.FC<Props> = ({
           {todo.title}
         </span>
       )}
-      <button
-        type="button"
-        className="todo__remove"
-        data-cy="TodoDelete"
-        onClick={() => onDelete(todo.id)}
-      >
-        ×
-      </button>
-
+      {!isEditing && (
+        <button
+          type="button"
+          className="todo__remove"
+          data-cy="TodoDelete"
+          onClick={() => onDelete(todo.id)}
+        >
+          ×
+        </button>
+      )}
       <div
         data-cy="TodoLoader"
         className={classNames('modal overlay', {

@@ -1,8 +1,10 @@
 import React from 'react';
 import { Todo } from '../../types/Todo';
 import { USER_ID } from '../../api/todos';
+import classNames from 'classnames';
 
 interface Props {
+  todos: Todo[];
   handleAddTodo: (newTodo: Todo) => void;
   newTitle: string;
   setNewTitle: (newTitle: string) => void;
@@ -12,6 +14,7 @@ interface Props {
 }
 
 export const Header: React.FC<Props> = ({
+  todos,
   handleAddTodo,
   newTitle,
   setNewTitle,
@@ -33,12 +36,16 @@ export const Header: React.FC<Props> = ({
   return (
     <header className="todoapp__header">
       {/* this button should have `active` class only if all todos are completed */}
-      <button
-        type="button"
-        className="todoapp__toggle-all active"
-        data-cy="ToggleAllButton"
-        onClick={taggleAll}
-      />
+      {todos.length > 0 && (
+        <button
+          type="button"
+          className={classNames('todoapp__toggle-all', {
+            active: todos.every(todo => todo.completed),
+          })}
+          data-cy="ToggleAllButton"
+          onClick={taggleAll}
+        />
+      )}
 
       {/* Add a todo on form submit */}
       <form
