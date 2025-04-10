@@ -21,34 +21,43 @@ export const TodoItem: React.FC<Props> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(todo.title);
 
+  function handleSave() {
+    const normalizedTitle = editedTitle.trim();
+
+    if (normalizedTitle === todo.title) {
+      setIsEditing(false);
+
+      return;
+    }
+
+    if (normalizedTitle === '') {
+      onDelete(todo.id);
+
+      return;
+    }
+
+    handleEdit(todo, normalizedTitle);
+    setIsEditing(false);
+  }
+
   function handleDoubleClick() {
     setIsEditing(true);
   }
 
-  function handleBlur() {
-    if (editedTitle.trim() !== todo.title) {
-      handleEdit(todo, editedTitle);
-    }
-
-    setIsEditing(false);
-  }
-
-  function handleKeyUp(event: React.KeyboardEvent) {
+  function handleKeyDown(event: React.KeyboardEvent) {
     if (event.key === 'Escape') {
       setIsEditing(false);
       setEditedTitle(todo.title);
-    } else if (event.key === 'Enter') {
-      handleBlur();
     }
+  }
+
+  function handleBlur() {
+    handleSave();
   }
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (editedTitle.trim() !== todo.title) {
-      handleEdit(todo, editedTitle);
-    }
-
-    setIsEditing(false);
+    handleSave();
   };
 
   return (
@@ -75,9 +84,10 @@ export const TodoItem: React.FC<Props> = ({
             value={editedTitle}
             onChange={e => setEditedTitle(e.target.value)}
             placeholder="Empty todo will be deleted"
-            onKeyUp={handleKeyUp}
+            onKeyUp={handleKeyDown}
             className="todo__title-field"
             autoFocus
+            onBlur={handleBlur}
           />
         </form>
       ) : (
