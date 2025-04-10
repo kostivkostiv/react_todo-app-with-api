@@ -9,7 +9,6 @@ type Props = {
   handleToggle: (todo: Todo) => void;
   handleEdit: (todo: Todo, updatedTitle: string) => Promise<boolean>;
   inputRef: React.RefObject<HTMLInputElement>;
-  error: string;
 };
 
 export const TodoItem: React.FC<Props> = ({
@@ -22,7 +21,6 @@ export const TodoItem: React.FC<Props> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(todo.title);
 
-  // Сохраняем изменения в заголовке
   async function handleSave() {
     const normalizedTitle = editedTitle.trim();
 
@@ -46,12 +44,10 @@ export const TodoItem: React.FC<Props> = ({
     }
   }
 
-  // Включаем режим редактирования
   function handleDoubleClick() {
     setIsEditing(true);
   }
 
-  // Обработчик нажатия клавиш
   function handleKeyDown(event: React.KeyboardEvent) {
     if (event.key === 'Escape') {
       setIsEditing(false);
@@ -59,12 +55,10 @@ export const TodoItem: React.FC<Props> = ({
     }
   }
 
-  // Обработчик потери фокуса
   function handleBlur() {
     handleSave();
   }
 
-  // Обработчик отправки формы
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     handleSave();
@@ -94,7 +88,7 @@ export const TodoItem: React.FC<Props> = ({
             value={editedTitle}
             onChange={e => setEditedTitle(e.target.value)}
             placeholder="Empty todo will be deleted"
-            onKeyDown={handleKeyDown} // Используем onKeyDown, а не onKeyUp
+            onKeyDown={handleKeyDown}
             className="todo__title-field"
             autoFocus
             onBlur={handleBlur}

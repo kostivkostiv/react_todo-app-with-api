@@ -181,15 +181,23 @@ export const App: React.FC = () => {
     todo: Todo,
     updatedTitle: string,
   ): Promise<boolean> {
-    if (updatedTitle.trim() === todo.title) {
+    const normalizedTitle = updatedTitle.trim();
+
+    if (normalizedTitle === todo.title) {
       return true;
+    }
+
+    if (normalizedTitle === '') {
+      handleDeleteTodo(todo.id);
+
+      return false;
     }
 
     setLoadingTodo(prev => [...prev, todo.id]);
 
     try {
       const updatedTodo = await updateTodo(todo.id, {
-        title: updatedTitle.trim(),
+        title: normalizedTitle,
         completed: todo.completed,
       });
 
@@ -228,7 +236,6 @@ export const App: React.FC = () => {
           handleToggle={handleToggleTodo}
           handleEdit={handleEdit}
           inputRef={inputRef}
-          error={error}
         />
         {/* Hide the footer if there are no todos */}
         {todos.length > 0 && (
