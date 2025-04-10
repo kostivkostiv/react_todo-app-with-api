@@ -177,30 +177,34 @@ export const App: React.FC = () => {
     });
   }
 
-  function handleEdit(todo: Todo, updatedTitle: string) {
+  async function handleEdit(
+    todo: Todo,
+    updatedTitle: string,
+  ): Promise<boolean> {
     if (updatedTitle.trim() === todo.title) {
-      return;
+      return true;
     }
 
     setLoadingTodo(prev => [...prev, todo.id]);
 
-    updateTodo(todo.id, {
-      title: updatedTitle.trim(),
-      completed: todo.completed,
-    })
-      .then(updatedTodo => {
-        setTodos(prevTodos => {
-          return prevTodos.map(t =>
-            t.id === updatedTodo.id ? updatedTodo : t,
-          );
-        });
-      })
-      .catch(() => {
-        setError(ErrorMessage.UPDATE);
-      })
-      .finally(() => {
-        setLoadingTodo(prev => prev.filter(id => id !== todo.id));
+    try {
+      const updatedTodo = await updateTodo(todo.id, {
+        title: updatedTitle.trim(),
+        completed: todo.completed,
       });
+
+      setTodos(prevTodos =>
+        prevTodos.map(t => (t.id === updatedTodo.id ? updatedTodo : t)),
+      );
+
+      return true;
+    } catch (e) {
+      setError(ErrorMessage.UPDATE);
+
+      return false;
+    } finally {
+      setLoadingTodo(prev => prev.filter(id => id !== todo.id));
+    }
   }
 
   return (
@@ -224,6 +228,7 @@ export const App: React.FC = () => {
           handleToggle={handleToggleTodo}
           handleEdit={handleEdit}
           inputRef={inputRef}
+          error={error}
         />
         {/* Hide the footer if there are no todos */}
         {todos.length > 0 && (

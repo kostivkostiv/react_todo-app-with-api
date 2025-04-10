@@ -7,8 +7,9 @@ type Props = {
   onDelete: (id: number) => void;
   loadingTodo: number[];
   handleToggle: (todo: Todo) => void;
-  handleEdit: (todo: Todo, updatedTitle: string) => void;
+  handleEdit: (todo: Todo, updatedTitle: string) => Promise<boolean>;
   inputRef: React.RefObject<HTMLInputElement>;
+  error: string;
 };
 
 export const TodoItem: React.FC<Props> = ({
@@ -21,7 +22,8 @@ export const TodoItem: React.FC<Props> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(todo.title);
 
-  function handleSave() {
+  // Сохраняем изменения в заголовке
+  async function handleSave() {
     const normalizedTitle = editedTitle.trim();
 
     if (normalizedTitle === todo.title) {
@@ -36,14 +38,20 @@ export const TodoItem: React.FC<Props> = ({
       return;
     }
 
-    handleEdit(todo, normalizedTitle);
-    setIsEditing(false);
+    const success = await handleEdit(todo, normalizedTitle);
+
+    if (success) {
+      setIsEditing(false);
+    } else {
+    }
   }
 
+  // Включаем режим редактирования
   function handleDoubleClick() {
     setIsEditing(true);
   }
 
+  // Обработчик нажатия клавиш
   function handleKeyDown(event: React.KeyboardEvent) {
     if (event.key === 'Escape') {
       setIsEditing(false);
@@ -51,10 +59,12 @@ export const TodoItem: React.FC<Props> = ({
     }
   }
 
+  // Обработчик потери фокуса
   function handleBlur() {
     handleSave();
   }
 
+  // Обработчик отправки формы
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     handleSave();
@@ -84,7 +94,7 @@ export const TodoItem: React.FC<Props> = ({
             value={editedTitle}
             onChange={e => setEditedTitle(e.target.value)}
             placeholder="Empty todo will be deleted"
-            onKeyUp={handleKeyDown}
+            onKeyDown={handleKeyDown} // Используем onKeyDown, а не onKeyUp
             className="todo__title-field"
             autoFocus
             onBlur={handleBlur}
@@ -99,6 +109,7 @@ export const TodoItem: React.FC<Props> = ({
           {todo.title}
         </span>
       )}
+
       {!isEditing && (
         <button
           type="button"
@@ -109,6 +120,7 @@ export const TodoItem: React.FC<Props> = ({
           ×
         </button>
       )}
+
       <div
         data-cy="TodoLoader"
         className={classNames('modal overlay', {

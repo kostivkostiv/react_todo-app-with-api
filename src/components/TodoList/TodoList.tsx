@@ -10,6 +10,7 @@ type Props = {
   handleToggle: (todo: Todo) => void;
   handleEdit: (todo: Todo, updatedTitle: string) => void;
   inputRef: React.RefObject<HTMLInputElement>;
+  error: string;
 };
 
 export const TodoList: React.FC<Props> = ({
@@ -20,6 +21,7 @@ export const TodoList: React.FC<Props> = ({
   handleToggle,
   handleEdit,
   inputRef,
+  error,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -32,6 +34,7 @@ export const TodoList: React.FC<Props> = ({
           handleToggle={handleToggle}
           handleEdit={handleEdit}
           inputRef={inputRef}
+          error={error}
         />
       ))}
       {tempTodo && (
@@ -43,6 +46,7 @@ export const TodoList: React.FC<Props> = ({
           handleToggle={handleToggle}
           handleEdit={handleEdit}
           inputRef={inputRef}
+          error={error}
         />
       )}
     </section>
